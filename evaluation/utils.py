@@ -17,10 +17,11 @@ try:
 except ImportError:
     print("Warning: graph_tool module is missing, motif analysis is not available.")
 
-dataloc = '.'
+dataloc = './../data/'
 
 
 def load_citeseer():
+    print(dataloc)
     with open(dataloc+'citeseer.data', 'rb') as f:
         data = p.load(f)
         graph = data['NXGraph']
@@ -132,9 +133,12 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
                               splits_ratio=[0.5], num_run=2, write_to_file=None):
     """Run node classification for the learned embedding."""
     _, _, labels = load_data(dataset_name)
-    emb = load_embeddings(emb_file)
+
+    emb = emb_file
     #--modification begin
-   ''' with open('reduced_emb','rb') as f1:
+    '''
+    #emb = load_embeddings(emb_file) 
+    with open('reduced_emb','rb') as f1:
         emb = p.load(f1,encoding='latin-1')
     f1.close()'''
     # --modification end
