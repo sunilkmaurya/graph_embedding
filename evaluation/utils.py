@@ -130,7 +130,7 @@ def get_top_k(labels):
 
 
 def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
-                              splits_ratio=[0.5], num_run=2, write_to_file=None):
+                              splits_ratio=[0.5], num_run=3, write_to_file=None):
     """Run node classification for the learned embedding."""
     _, _, labels = load_data(dataset_name)
 
