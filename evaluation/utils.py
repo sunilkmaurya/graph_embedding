@@ -143,14 +143,15 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
     f1.close()'''
     # --modification end
     
-    
+    #indices list for data
+    indices = np.arange(emb.shape[0])
     results_str = []
     averages = ["micro", "macro", "samples", "weighted"]
     for run in range(num_run):
         results_str.append("\nRun number {}:\n".format(run+1))
         for sr in splits_ratio:
-            X_train, X_test, y_train, y_test = train_test_split(
-                emb, labels, test_size=sr, random_state=run)
+            X_train, X_test, y_train, y_test, indices_train, indices_test = train_test_split(
+                emb, labels,indices, test_size=sr, random_state=run)
             top_k_list = get_top_k(y_test)
             mclf = TopKRanker(clf)
             mclf.fit(X_train, y_train)
