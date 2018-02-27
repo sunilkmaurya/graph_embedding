@@ -130,7 +130,7 @@ def get_top_k(labels):
 
 
 def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
-                              splits_ratio=[0.5], num_run=3, write_to_file=None):
+                              splits_ratio=[0.5], num_run=1, write_to_file=None):
     """Run node classification for the learned embedding."""
     _, _, labels = load_data(dataset_name)
 
@@ -163,6 +163,11 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
                                                         average=avg)) + '\n'
             str_output += "Accuracy: " + str(accuracy_score(test_results, y_test)) + '\n'
             results_str.append(str_output)
+            with open('stats_'+str(emb.shape[1])+'.pickle','wb') as fileopen:
+                p.dump([indices_test,test_results,y_test],fileopen,protocol=p.HIGHEST_PROTOCOL)
+                print("file saved")
+            fileopen.close()
+
     info = "Embedding dim: {}, graph: {}".format(emb.shape[1], dataset_name)
     if write_to_file:
         with open(write_to_file, 'w') as f:
