@@ -134,7 +134,10 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
     """Run node classification for the learned embedding."""
     _, _, labels = load_data(dataset_name)
 
-    emb = emb_file
+    #emb = emb_file
+    #using the original load_embedding function
+    
+    emb = load_embeddings(emb_file)
     #--modification begin
     '''
     #emb = load_embeddings(emb_file) 
@@ -163,7 +166,7 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
                                                         average=avg)) + '\n'
             str_output += "Accuracy: " + str(accuracy_score(test_results, y_test)) + '\n'
             results_str.append(str_output)
-            with open('stats_'+str(emb.shape[1])+'.pickle','wb') as fileopen:
+            with open('stats_'+str(dataset_name)+'.pickle','wb') as fileopen:
                 p.dump([indices_test,test_results,y_test],fileopen,protocol=p.HIGHEST_PROTOCOL)
                 print("file saved")
             fileopen.close()
