@@ -44,7 +44,7 @@ def load_cora():
 
 
 def load_blogcatalog():
-    with open('blogcatalog.data', 'rb') as f:
+    with open(dataloc+'blogcatalog.data', 'rb') as f:
         data = p.load(f)
         graph = data['NXGraph']
         features = None
