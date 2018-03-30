@@ -10,6 +10,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.manifold import TSNE
 from matplotlib import pyplot as plt
 from time import time
+import networkx as nx
 try:
     from graph_tool.clustering import motifs, motif_significance
     from graph_tool.spectral import adjacency
@@ -138,6 +139,7 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
     #using the original load_embedding function
     
     emb = load_embeddings(emb_file)
+    gr = nx.read_edgelist(dataloc+dataset_name+".edges")
     #--modification begin
     '''
     #emb = load_embeddings(emb_file) 
@@ -155,21 +157,35 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
         for sr in splits_ratio:
             X_train, X_test, y_train, y_test, indices_train, indices_test = train_test_split(
                 emb, labels,indices, test_size=sr, random_state=run)
+            
             top_k_list = get_top_k(y_test)
             mclf = TopKRanker(clf)
             mclf.fit(X_train, y_train)
             test_results = mclf.predict(X_test, top_k_list,
                                         num_classes=labels.shape[1])
             str_output = "Train ratio: {}\n".format(1.0 - sr)
+            #---code start-----
+            #modify labels with respect to neighbors
+            for c in range(len(indices_test)):
+                if gr.degree(str(indices_test[c]))==1:
+                    neighbor = list(gr.neighbors(str(indices_test[c])))
+                    if int(neighbor[0]) in indices_train:
+                        neighbor_index = np.where(indices_train==int(neighbor[0]))
+                        neighbor_index = int(neighbor_index[0])
+                        test_results[c,:]=y_train[neighbor_index,:].todense()
+                        
+            #---code end--------
             for avg in averages:
                 str_output += avg + ': ' + str(f1_score(test_results, y_test,
                                                         average=avg)) + '\n'
             str_output += "Accuracy: " + str(accuracy_score(test_results, y_test)) + '\n'
             results_str.append(str_output)
+            '''
             with open('stats_'+str(dataset_name)+'.pickle','wb') as fileopen:
                 p.dump([indices_test,test_results,y_test,indices,labels],fileopen,protocol=p.HIGHEST_PROTOCOL)
                 print("file saved")
             fileopen.close()
+            '''
 
     info = "Embedding dim: {}, graph: {}".format(emb.shape[1], dataset_name)
     if write_to_file:
