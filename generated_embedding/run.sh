@@ -1,7 +1,7 @@
 #! /bin/bash
 
 echo "Going to create embeddings with deep walk"
-for f in blogcatalog.edges
+for f in pubmed.edges
 do
 	echo "File is $f  "
 	echo " Loading edgelist :"

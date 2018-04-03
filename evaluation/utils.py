@@ -132,8 +132,11 @@ def get_top_k(labels):
 def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
                               splits_ratio=[0.5], num_run=1, write_to_file=None):
     """Run node classification for the learned embedding."""
-    _, _, labels = load_data(dataset_name)
-
+    #_, _, labels = load_data(dataset_name)
+    
+    #this modification is for pubmed labels
+    f_label = open(dataloc+"pubmed.labels","rb")
+    labels = p.load(f_label)
     #emb = emb_file
     #using the original load_embedding function
     
