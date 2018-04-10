@@ -136,7 +136,7 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
     #_, _, labels = load_data(dataset_name)
     
     #this modification is for pubmed labels
-    f_label = open(dataloc+"pubmed.labels","rb")
+    f_label = open(dataloc+"reddit_sparse.labels","rb")
     labels = p.load(f_label)
     #modification end 
     
@@ -144,6 +144,8 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
     #using the original load_embedding function
     
     emb = load_embeddings(emb_file)
+    print("Embedding dimensions are:")
+    print(emb.shape)
     gr = nx.read_edgelist(dataloc+dataset_name+".edges")
     #--modification begin
     '''
@@ -169,6 +171,7 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
             test_results = mclf.predict(X_test, top_k_list,
                                         num_classes=labels.shape[1])
             str_output = "Train ratio: {}\n".format(1.0 - sr)
+            print(type(test_results))
             #---code start-----
             #modify labels with respect to neighbors
             for c in range(len(indices_test)):
@@ -177,8 +180,8 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
                     if int(neighbor[0]) in indices_train:
                         neighbor_index = np.where(indices_train==int(neighbor[0]))
                         neighbor_index = int(neighbor_index[0])
-                        #test_results[c,:]=y_train[neighbor_index,:].todense()
-                        test_results[c,:]=y_train[neighbor_index,:]
+                        test_results[c,:]=y_train[neighbor_index,:].todense()
+                        #test_results[c,:]=y_train[neighbor_index,:]
                         
             #---code end--------
             for avg in averages:

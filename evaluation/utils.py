@@ -135,7 +135,7 @@ def run_embedding_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
     #_, _, labels = load_data(dataset_name)
     
     #this modification is for pubmed labels
-    f_label = open(dataloc+"pubmed.labels","rb")
+    f_label = open(dataloc+"reddit_sparse.labels","rb")
     labels = p.load(f_label)
     #emb = emb_file
     #using the original load_embedding function
