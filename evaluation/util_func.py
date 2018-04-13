@@ -188,29 +188,16 @@ def modified_classify_f1(dataset_name, emb_file, clf=LogisticRegression(),
     return write_to_file
 
 def graph_classify_analysis(dataset_name,graph_stat=True):
+    
     with open('stats_'+dataset_name+'.pickle','rb') as f_emb:
         emb_indices,emb_predict,emb_label,all_indices,labels = p.load(f_emb)
-    
     f_emb.close()
-
-    print(f"emb_indices {type(emb_indices)}")
     
-    print(f"emb_predict {type(emb_predict)}")
+    #converting sparse arrays to dense arrays and ndarray conversion
+    emb_label = np.asarray(emb_label.todense())
+    labels = np.asarray(labels.todense())
 
-    print(f"emb_label {type(emb_label)}")
-    temp1 = np.asarray(emb_label.todense())
-    print(f" ch-emb_label {type(temp1)}")
-    print(temp1.shape)
-    
-    print(f"all_indices {type(all_indices)}")
-    print(f"labels {type(labels)}")
-    
-    temp2 = np.asarray(labels.todense())
-    print(temp2.shape)
-    print(f" ch-labels {type(temp2)} and {temp2.shape}")
-    #print(type(np.asarray(emb_label.todense())))
-    print("\n\n")
-
+    #reading graph 
     g = nx.read_edgelist(graph_location+dataset_name+".edges")
     if graph_stat == True:
         print(f"Graph is {dataset_name}:")
@@ -219,6 +206,7 @@ def graph_classify_analysis(dataset_name,graph_stat=True):
     table = PrettyTable(['Serial No.','Node no.','True Label','Predicted Label','Degree','Neighbor label','Neighbor Match'])
     counter = 0
     match_counter=0
+    #the loop below compares the label of specified degree node to its neighbor's
     for i in range(len(emb_indices)):
         if (np.array_equal(emb_predict[i,:],emb_label[i,:]))== False:
             if g.degree(str(emb_indices[i]))==1:
@@ -234,14 +222,14 @@ def graph_classify_analysis(dataset_name,graph_stat=True):
                     match_counter += 1
                 else:
                     match=False
-                table.add_row([counter,str(emb_indices[i]),np.where(emb_label[i,:].todense()!=0),np.where(emb_predict[i,:]!=0),g.degree(str(emb_indices[i])),np.where(labels[int(neighbor[0]),:].todense()!=0),match])
+                table.add_row([counter,str(emb_indices[i]),np.where(emb_label[i,:]!=0),np.where(emb_predict[i,:]!=0),g.degree(str(emb_indices[i])),np.where(labels[int(neighbor[0]),:]!=0),match])
     print(table)
     print(f"Total cases of neighbor label matches are: {match_counter}")
     #to count number of wrongly classified nodes
     print("For test set label classification prediction results")
     counts = dict()
+    #this counts the number of wrong predictions of nodes with degrees
     for i in range(len(emb_indices)):
-
         if (np.array_equal(emb_predict[i,:],emb_label[i,:]))== False:
             degree = g.degree(str(emb_indices[i]))
             counts[degree] = counts.get(degree,0)+1
@@ -257,6 +245,6 @@ def graph_classify_analysis(dataset_name,graph_stat=True):
         
     print(f"Statistics for dataset: {dataset_name}")
     print("---------------------------------")
-    
+
     for i in sorted(counts.keys()):
         print("For degree "+str(i)+" total: "+str(counts_total[i])+" ("+str(int((counts_total[i]/total_test_nodes)*100))+"%) and wrong prediction: "+ str(counts[i])+"("+str(int(counts[i]/counts_total[i]*100))+"%)")
