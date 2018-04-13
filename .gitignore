@@ -1,2 +1,4 @@
 
 *.pyc
+
+evaluation/\.ipynb_checkpoints/deepwalk_analysis-checkpoint\.ipynb

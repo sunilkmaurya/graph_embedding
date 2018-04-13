@@ -193,10 +193,23 @@ def graph_classify_analysis(dataset_name,graph_stat=True):
     
     f_emb.close()
 
-    #print(emb_indices.shape)
-    #print(emb_predict.shape)
-    #print(emb_label.shape)
-    #print("\n\n")
+    print(f"emb_indices {type(emb_indices)}")
+    
+    print(f"emb_predict {type(emb_predict)}")
+
+    print(f"emb_label {type(emb_label)}")
+    temp1 = np.asarray(emb_label.todense())
+    print(f" ch-emb_label {type(temp1)}")
+    print(temp1.shape)
+    
+    print(f"all_indices {type(all_indices)}")
+    print(f"labels {type(labels)}")
+    
+    temp2 = np.asarray(labels.todense())
+    print(temp2.shape)
+    print(f" ch-labels {type(temp2)} and {temp2.shape}")
+    #print(type(np.asarray(emb_label.todense())))
+    print("\n\n")
 
     g = nx.read_edgelist(graph_location+dataset_name+".edges")
     if graph_stat == True:
@@ -214,18 +227,21 @@ def graph_classify_analysis(dataset_name,graph_stat=True):
                 #print(neighbor)
                 #n_label_ind = np.where(all_indices==neighbor[0])
                 #print(n_label_ind)
-                if np.nonzero(emb_label[i,:])==np.nonzero(labels[int(neighbor[0]),:]):
+
+                if np.array_equal(emb_label[i,:],labels[int(neighbor[0]),:]):
+                    #if np.array_equal( np.where(emb_label[i,:]!=0) , np.where(labels[int(neighbor[0]),:]!=0)):
                     match=True
                     match_counter += 1
                 else:
                     match=False
-                table.add_row([counter,str(emb_indices[i]),np.nonzero(emb_label[i,:]),np.nonzero(emb_predict[i,:]),g.degree(str(emb_indices[i])),np.nonzero(labels[int(neighbor[0]),:]),match])
+                table.add_row([counter,str(emb_indices[i]),np.where(emb_label[i,:].todense()!=0),np.where(emb_predict[i,:]!=0),g.degree(str(emb_indices[i])),np.where(labels[int(neighbor[0]),:].todense()!=0),match])
     print(table)
     print(f"Total cases of neighbor label matches are: {match_counter}")
     #to count number of wrongly classified nodes
     print("For test set label classification prediction results")
     counts = dict()
     for i in range(len(emb_indices)):
+
         if (np.array_equal(emb_predict[i,:],emb_label[i,:]))== False:
             degree = g.degree(str(emb_indices[i]))
             counts[degree] = counts.get(degree,0)+1
